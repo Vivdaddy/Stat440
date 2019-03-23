@@ -1,0 +1,35 @@
+---
+title: "Graph Visualization"
+author: "Vivek Anand"
+date: "March 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Library Declarations
+library(igraph)
+
+### 2008 Data
+edges1_dataframe<-read.csv("1-edges.csv")
+head(edges1_dataframe)
+names(edges1_dataframe)<-c("Node1","Node2","Strength_of_Interaction")
+
+## Calculate number of nodes
+num_nodes<-nrow(read.csv("nodes.csv"))
+el<-matrix(nrow= nrow(edges1_dataframe), ncol=2)
+el[,1]<-edges1_dataframe$Node1
+el[,2]<-edges1_dataframe$Node2
+head(el)
+g=graph.data.frame(el)
+#g
+contact_matrix1<-get.adjacency(g,type="both")
+
+
+
+
+```
+
