@@ -19,49 +19,35 @@ library(igraph)
 edges1_dataframe<-read.csv("1-edges.csv")
 names(edges1_dataframe)<-c("Node1","Node2","Boolean Interaction")
 tail(edges1_dataframe,10)
-nodes1<-read.csv("nodes.csv")
-g1=graph_from_data_frame(d=edges1_dataframe, vertices=nodes1, directed=FALSE)
+nodes<-read.csv("nodes.csv")
+g1=graph_from_data_frame(d=edges1_dataframe, vertices=nodes, directed=FALSE)
 contact_matrix1<-get.adjacency(g1,type="both")
 
+#### 2-edges.csv
+##### Not doing this yet as documentation is not good
 
+#### 3-edges.csv
+edges3_dataframe<-read.csv("3-edges.csv")
+names(edges3_dataframe)<-c("Node1","Node2","Number of Shared Subscriptions")
+g3=graph_from_data_frame(d=edges3_dataframe, vertices=nodes, directed=FALSE)
+contact_matrix3<-get.adjacency(g3,type="both")
 
+#### 4-edges.csv
+edges4_dataframe<-read.csv("4-edges.csv")
+names(edges4_dataframe)<-c("Node1","Node2","Number of Shared Subscribers")
+g4=graph_from_data_frame(d=edges4_dataframe, vertices=nodes, directed=FALSE)
+contact_matrix4<-get.adjacency(g4,type="both")
 
-```
-
-=======
----
-title: "Graph Visualization"
-author: "Vivek Anand"
-date: "March 23, 2019"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
-## Library Declarations
-library(igraph)
-
-### 2008 Data
-edges1_dataframe<-read.csv("1-edges.csv")
-head(edges1_dataframe)
-names(edges1_dataframe)<-c("Node1","Node2","Strength_of_Interaction")
-
-## Calculate number of nodes
-num_nodes<-nrow(read.csv("nodes.csv"))
-el<-matrix(nrow= nrow(edges1_dataframe), ncol=2)
-el[,1]<-edges1_dataframe$Node1
-el[,2]<-edges1_dataframe$Node2
-head(el)
-g=graph.data.frame(el)
-#g
-contact_matrix1<-get.adjacency(g,type="both")
+#### 5-edges.csv
+edges5_dataframe<-read.csv("5-edges.csv")
+names(edges5_dataframe)<-c("Node1","Node2","Number of Shared favorite Videos")
+g5=graph_from_data_frame(d=edges5_dataframe, vertices=nodes, directed=FALSE)
+contact_matrix5<-get.adjacency(g5,type="both")
 
 
 
 
 ```
+
 
 >>>>>>> 86707a0013be9a49f7b37b629a578b4e4e91fd10
