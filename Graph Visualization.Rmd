@@ -1,0 +1,29 @@
+---
+title: "Graph Visualization"
+author: "Vivek Anand"
+date: "March 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Library Declarations
+library(igraph)
+
+### 2008 Data
+#### 1-edges.csv
+edges1_dataframe<-read.csv("1-edges.csv")
+names(edges1_dataframe)<-c("Node1","Node2","Boolean Interaction")
+tail(edges1_dataframe,10)
+nodes1<-read.csv("nodes.csv")
+g1=graph_from_data_frame(d=edges1_dataframe, vertices=nodes1, directed=FALSE)
+contact_matrix1<-get.adjacency(g1,type="both")
+
+
+
+
+```
+
