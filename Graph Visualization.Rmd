@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "Graph Visualization"
 author: "Vivek Anand"
@@ -10,15 +9,16 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r cachedChunk1, cache = TRUE}
 ## Library Declarations
 library(igraph)
+library(Matrix)
 
 ### 2008 Data
 #### 1-edges.csv
 edges1_dataframe<-read.csv("1-edges.csv",header=FALSE)
 names(edges1_dataframe)<-c("Node1","Node2","Boolean Interaction")
-tail(edges1_dataframe,10)
+#tail(edges1_dataframe,10)
 nodes<-read.csv("nodes.csv",header=FALSE)
 g1=graph_from_data_frame(d=edges1_dataframe, vertices=nodes, directed=FALSE)
 contact_matrix1<-get.adjacency(g1,type="both")
@@ -46,10 +46,120 @@ names(edges5_dataframe)<-c("Node1","Node2","Number of Shared favorite Videos")
 g5=graph_from_data_frame(d=edges5_dataframe, vertices=nodes, directed=FALSE)
 contact_matrix5<-get.adjacency(g5,type="both")
 
+```
+
+Now lets plot the degree distribution of the shared subscriber network.
+```{r cachedChunk2,cache=TRUE}
+library(igraph)
+shared_subscriber_degrees<-degree.distribution(g4)
+length(shared_subscriber_degrees)
+head(shared_subscriber_degrees)
+tail(shared_subscriber_degrees)
+plot(1:600,shared_subscriber_degrees[1:600],main="Degree Distribution for Number of Shared Subscribers",xlab="Number of Shared Subscribers",ylab="Fraction of Total Population","h")
+```
+
+There is atleast one person, who has 5959 total shared subscribers here from the above data. Our goal is to find that person by sampling people from the entire dataset and then using an algorithm to eventually find the person who has connections with the most youtubers. Interpretation of this will be done later. This algorithm will be taken from infectious disease control. Here is the context for that algorithm.
+
+Assume that in a sexually transmitted disease epidemic, there are a limited number of vaccines available. One has to find out whom to vaccinate to minimize the number of people infected. 
 
 
+1) *Randomly Sample one individual A from those who you know have been infected.* 
+2) *Ask A who he/she had intercourse with last. Assume this person is B.*
+3) *Ask B who he/she had intercourse with last. Assume this person is C.*
+4) *Vaccinate C.* 
+5) *Repeat several times.*
+
+You have a high probability of having vaccinated the high risk individuals now. We will explain in class how this works.
+
+For the youtube dataset however, we will modify the algorithm as follows.
+
+Assume that each individual has a importance counter that is initialized to 0.
+
+1) *Randomly sample one individual A from the entire network who has atleast one shared subscriber.* 
+2) *Find the person B who A has the most shared subscribers with.*
+3) *Find person C who B has most shared subscribers with *
+4) *Increase C's importance counter by one. (This may be modified later)*
+5) *Repeat several times.*
+
+```{r cachedChunk3,cache=TRUE}
+vertices_g4<-V(g4)
+
+
+algos<-function(nodes,samples){
+  #Initial Variables
+  num_nodes<-nrow(contact_matrix4)
+  importance_counter<-numeric(num_nodes)
+  current_count<-0
+  #print(current_count)
+  while (current_count<samples){
+    # Sample A
+    node_B=0
+    # Handle case where node A does not have any neighbors
+    while (node_B==0){
+      node_A<-sample(nodes,size=1)
+      #Get B
+      node_B<-which(contact_matrix4[node_A,]==max(contact_matrix4[node_A,]))
+      node_B<-sample(node_B,1)
+      #print(node_B)
+    }
+ 
+    #C
+    node_C<-which(contact_matrix4[node_B,]==max(contact_matrix4[node_B,]))
+    importance_counter[node_C]<-importance_counter[node_C]+1
+    current_count<-current_count+1
+  
+  }
+  return(importance_counter)
+}
 
 ```
 
+```{r cachedChunk4,cache=TRUE}
+# Prepped data
+nrow(contact_matrix4)
+ncol(contact_matrix4)
+contact_matrix4<-as.matrix(contact_matrix4)
+cm_table<-which(contact_matrix4!=0,arr.ind = TRUE)
+head(cm_table)
+values<-cm_table[,"row"]
+head(values,20)
+unique_value_nodes<-unique(values)
+head(unique_value_nodes,20)
+```
 
->>>>>>> 86707a0013be9a49f7b37b629a578b4e4e91fd10
+```{r cachedChunk5,cache=TRUE}
+#Run the model once
+vec<-algos(unique_value_nodes,1)
+```
+
+
+```{r cachedChunk6,cache=TRUE}
+head(vec)
+tail(vec)
+sum(vec)
+#Maximum value
+max(vec)
+#Maximum value nodes
+which(vec==max(vec))
+```
+
+Now let's try to simulate 100,000 iterations to get the maximum value properly
+```{r cachedChunk7,cache=TRUE}
+lots_of_vec<-algos(unique_value_nodes,100000)
+
+```
+
+```{r cachedChunk8, cache=TRUE}
+sum(lots_of_vec)
+#Max value
+max(lots_of_vec)
+
+#Maximum value nodes
+which(lots_of_vec==max(lots_of_vec))
+```
+
+This guy node 1189 is probably the person we talked about earlier. He is likely to be the one with the total 5959 shared subscribers. Yes, this algorithm has not been so great due to the ridiculous number of iterations and preparation to find this guy instead of a simple graph traversal, but such an approach allows one to sample and identify the influential people in the network without needing all of the network information at once. 
+
+One can iteratively obtain information and still get enough insights into the network without needing all the information all at once.
+
+Of course, this can be improved by better methods of sampling or by changing the weight of the importance counter as a function of the number of shared neighbors but this is a great start for analyzing networks in an almost monte carlo approach.
