@@ -47,7 +47,7 @@ find_complete_subgraphs <- function(data, min.max = c(451,452)){
 
         temp3 <- unique(c(graph[[(iter)]][,1], graph[[(iter)]][,2])) # this is all of the nodes in the graph that just got subsetted
         temp3 <- temp3[which(temp3 %!in% unique(c(graph[[(iter+1)]][[i]][,1], graph[[(iter+1)]][[i]][,2])))] # this is all of the nodes that we left behind: the vertices and some first neighbors who didnt neighbor anyone else
-        leftout[[iter]] <- temp3[which(temp3 %!in% vertices_csg[[iter]][[i]])] #these are those neighbors who were left behind
+        leftout[[iter]][[i]] <- c(temp3[which(temp3 %!in% vertices_csg[[iter]][[i]])]) #these are those neighbors who were left behind
       }
       # we want to leave the function at this point:
       return(list(graph[-1], complete_subgraphs, vertices_csg, leftout))
@@ -81,44 +81,65 @@ find_complete_subgraphs <- function(data, min.max = c(451,452)){
 }
 
 
-plz <- find_complete_subgraphs(data2)
+first <- find_complete_subgraphs(data2)
 warnings()
 
-nrow(plz[[1]][[5]][[1]])
-nrow(plz[[1]][[5]][[2]])
-length(unique(c(plz[[1]][[5]][[2]][,1], plz[[1]][[5]][[2]][,2])))
-length(unique(c(plz[[1]][[5]][[1]][,1], plz[[1]][[5]][[1]][,2])))
-length(unique(c(plz[[1]][[5]][[2]][,1], plz[[1]][[5]][[2]][,2], plz[[1]][[5]][[1]][,1], plz[[1]][[5]][[1]][,2])))
+nrow(first[[1]][[5]][[1]])
+nrow(first[[1]][[5]][[2]])
+length(unique(c(first[[1]][[5]][[2]][,1], first[[1]][[5]][[2]][,2])))
+length(unique(c(first[[1]][[5]][[1]][,1], first[[1]][[5]][[1]][,2])))
+length(unique(c(first[[1]][[5]][[2]][,1], first[[1]][[5]][[2]][,2], first[[1]][[5]][[1]][,1], first[[1]][[5]][[1]][,2])))
 # ^ we see that its subsetted, as it should have done in the instance of a "special case"
 
-while(T){
-  plz
+check <- function(output.list){
+  a <- output.list
+  for(i in 1:length(a[[4]])){
+    if(i == length(a[[4]])){
+      for(j in 1:length(a[[4]][[length(a[[4]])]])){
+        print(a[[4]][[i]][[j]])
+      }
+    }else{
+      print(a[[4]][[i]])
+    }
+  }
 }
+check(first)
+# leftout[[]]
+# so far so good!
 
-yay2 <- find_complete_subgraphs(plz[[1]][[5]][[1]], min.max = c(185,186))
 
-length(yay[[3]][[5]])
 
+second <- find_complete_subgraphs(first[[1]][[5]][[2]], min.max = c((length(first[[2]][[length(first[[2]])]][[1]])-2),(length(first[[2]][[length(first[[2]])]][[1]])-1)))
+for(i in 1:length(second[[4]])){
+  if(i == 5){
+    for(j in 1:2){
+      print((second[[4]][[i]][[j]]))
+    }
+  }else{
+    print((second[[4]][[i]]))
+  }
+}
+# ^ great!
 unique.pairs <- c(0)
-for(i in 2:length(yay[[3]][[5]])){
-  unique.pairs <- c(unique.pairs, sum(yay[[3]][[5]][[1]] %in% yay[[3]][[5]][[i]]))
+for(i in 2:length(second[[3]][[5]])){
+  unique.pairs <- c(unique.pairs, sum(second[[3]][[5]][[1]] %in% second[[3]][[5]][[i]]))
 }
 # 1 doesnt have anything in common with the rest!
-for(i in 3:length(yay[[3]][[5]])){
-  unique.pairs <- c(unique.pairs, sum(yay[[3]][[5]][[2]] %in% yay[[3]][[5]][[i]]))
+for(i in 3:length(second[[3]][[5]])){
+  unique.pairs <- c(unique.pairs, sum(second[[3]][[5]][[2]] %in% second[[3]][[5]][[i]]))
 }
-for(i in 4:length(yay[[3]][[5]])){
-  unique.pairs <- c(unique.pairs, sum(yay[[3]][[5]][[3]] %in% yay[[3]][[5]][[i]]))
+for(i in 4:length(second[[3]][[5]])){
+  unique.pairs <- c(unique.pairs, sum(second[[3]][[5]][[3]] %in% second[[3]][[5]][[i]]))
 }
-for(i in 5:length(yay[[3]][[5]])){
-  unique.pairs <- c(unique.pairs, sum(yay[[3]][[5]][[4]] %in% yay[[3]][[5]][[i]]))
+for(i in 5:length(second[[3]][[5]])){
+  unique.pairs <- c(unique.pairs, sum(second[[3]][[5]][[4]] %in% second[[3]][[5]][[i]]))
 }
-unique.pairs <- c(unique.pairs, sum(yay[[3]][[5]][[5]] %in% yay[[3]][[5]][[6]]))
+unique.pairs <- c(unique.pairs, sum(second[[3]][[5]][[5]] %in% second[[3]][[5]][[6]]))
 unique.pairs
 
 
 
-hap1 <- find_complete_subgraphs(yay2[[1]][[6]][[6]], min.max = c(98,99))
-hap2 <- find_complete_subgraphs(hap1[[1]][[4]][[2]], min.max = c(82,83))
+third <- find_complete_subgraphs(second[[1]][[5]][[6]], min.max = c(98,99))
+fourth <- find_complete_subgraphs(third[[1]][[4]][[2]], min.max = c(82,83))
 
-length(unique(c(hap1[[1]][[4]][[2]][,1], hap1[[1]][[4]][[2]][,2])))
+length(unique(c(third[[1]][[4]][[2]][,1], third[[1]][[4]][[2]][,2])))
